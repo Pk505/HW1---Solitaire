@@ -1,19 +1,7 @@
 #include <iostream>
 #include <vector>
+#include "header.h"
 
-struct card {
-    card *upper_left = nullptr;
-    card *upper_right = nullptr;
-    card *lower_left = nullptr;
-    card *lower_right = nullptr;
-    int value;
-};
-struct row {
-    card *cards;
-};
-struct layout {
-    row *rows;
-};
 
 int main() {
     layout user_layout;
@@ -21,7 +9,7 @@ int main() {
 
     //filling the layout with user's values
     for (int i = 0; i < 7; i++) {
-        user_layout.rows[i].cards = new card[i+1];
+        user_layout.rows[i].cards = new card[i + 1];
         for (int j = 0; j <= i; j++) {
             std::cout << "Enter the " << j + 1 << " value for the " << i + 1 << " row:" << std::endl;
             std::cin >> user_layout.rows[i].cards[j].value;
@@ -35,7 +23,17 @@ int main() {
             }
         }
     }
-    
+
+    std::vector<card> active_cards = {user_layout.rows[6].cards[0], user_layout.rows[6].cards[1],
+                                      user_layout.rows[6].cards[2], user_layout.rows[6].cards[3],
+                                      user_layout.rows[6].cards[4], user_layout.rows[6].cards[5],
+                                      user_layout.rows[6].cards[6],};
+
+
+    erase(active_cards[6], active_cards);
+    erase(active_cards[5], active_cards);
+
+
     for (int i = 0; i < 7; i++)
         delete[] user_layout.rows[i].cards;
     delete[] user_layout.rows;
