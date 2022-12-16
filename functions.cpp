@@ -123,6 +123,7 @@ bool try_delete_with_top_card(std::vector<card> &cards, int &top_card, std::vect
             }
             return true;
         } else if (remaining_deck.empty()) {
+            fall_cards.push_back(top_card);
             top_card = 0;
         }
     }
