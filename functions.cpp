@@ -1,6 +1,6 @@
 #include "header.h"
 
-void erase(const card &erasing_card, std::vector<card> &changing_cards) {
+void erase(const card erasing_card, std::vector<card> &changing_cards) {
     for (auto it = changing_cards.begin(); it != changing_cards.end(); ++it) { //deleting card
         if ((it->upper_right == erasing_card.upper_right) &&
             (it->upper_left == erasing_card.upper_left) &&
@@ -27,8 +27,8 @@ void erase(const card &erasing_card, std::vector<card> &changing_cards) {
 }
 
 bool is_numeric(const std::string &string_for_number) {
-    for (int i = 0; i < string_for_number.size(); i++)
-        if (std::isdigit(string_for_number[i]) == false)
+    for (char i: string_for_number)
+        if (std::isdigit(i) == false)
             return false;
     return true;
 }
@@ -65,9 +65,9 @@ bool is_input_correct(std::vector<std::vector<int>> &deck, std::string &value, i
     }
 }
 
-std::vector<int> shuffle(std::vector<std::vector<int>> &deck) {
+std::vector<int> shuffle(std::vector<std::vector<int>> deck) {
     srand(time(nullptr));
-    bool are_empty_deleted = false; //deleting empty values from deck
+    bool are_empty_deleted; //deleting empty values from deck
     do {
         are_empty_deleted = true;
         for (auto it = deck.begin(); it != deck.end(); ++it) {
@@ -81,7 +81,7 @@ std::vector<int> shuffle(std::vector<std::vector<int>> &deck) {
 
     std::vector<int> shuffled_values;
     while (!deck.empty()) {
-        short int value_index = rand() % deck.size(); //getting random value
+        int value_index = rand() % deck.size(); //getting random value
         shuffled_values.push_back(
                 deck[value_index][deck[value_index].size() - 1]);  //recieving the last element in value
         deck[value_index].pop_back(); // deleting last element with this value
@@ -90,5 +90,49 @@ std::vector<int> shuffle(std::vector<std::vector<int>> &deck) {
         }
     }
     return shuffled_values;
+}
+
+bool try_delete(std::vector<card> &cards) {
+    for (int i = 0; i < cards.size(); i++) {
+        if (cards[i].value == 13) {
+            erase(cards[i], cards);
+            return true;
+        }
+        for (int j = i + 1; j < cards.size(); j++) {
+            if (cards[i].value + cards[j].value == 13) {
+                erase(cards[i], cards);
+                erase(cards[j - 1], cards);   //when we erase first card, the index of the second card decreased by one
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool try_delete_with_top_card(std::vector<card> &cards, int &top_card, std::vector<int> &fall_cards,
+                              std::vector<int> &remaining_deck) {
+    for (int i = 0; i < cards.size(); i++) {
+        if (top_card + cards[i].value == 13) {
+            erase(cards[i], cards);
+            if (!fall_cards.empty()) {
+                top_card = fall_cards[fall_cards.size() - 1];
+                fall_cards.pop_back();
+            } else if (!remaining_deck.empty()) {
+                top_card = remaining_deck[remaining_deck.size() - 1];
+                remaining_deck.pop_back();
+            }
+            return true;
+        } else if (remaining_deck.empty()) {
+            top_card = 0;
+        }
+    }
+    return false;
+}
+
+bool retake_deck(std::vector<int> &remaining_deck, std::vector<int> &fall_cards) {
+    while (!fall_cards.empty()) {
+        remaining_deck.push_back(fall_cards[fall_cards.size()-1]);
+        fall_cards.pop_back();
+    }
 }
 
